@@ -1,3 +1,7 @@
+# Package managers
+/vendor
+composer.lock
+
 # Windows
 Thumbs.db
 ehthumbs.db

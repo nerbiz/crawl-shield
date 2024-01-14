@@ -24,12 +24,15 @@ composer require nerbiz/crawl-shield
 
 #### Configuration
 
-If needed, you can add these settings to you `.env` file:
+If needed, you can add settings to your `.env` file.
 
-CRAWL_SHIELD_PARAMETER (default 'pass')
-CRAWL_SHIELD_PASSWORD (default 'abc123')
-CRAWL_SHIELD_ENABLED (default true)
-CRAWL_SHIELD_ENABLED_IN_PRODUCTION (default false)
+The default values result in https://example.com/?pass=abc123, you change that parameter and password with these: 
+- `CRAWL_SHIELD_PARAMETER` (default 'pass') 
+- `CRAWL_SHIELD_PASSWORD` (default 'abc123')
+
+You can also disable the mechanism, or make it active in production:
+- `CRAWL_SHIELD_ENABLED` (default true)
+- `CRAWL_SHIELD_ENABLED_IN_PRODUCTION` (default false)
 
 #### Add middleware
 
