@@ -46,4 +46,4 @@ Then add the `crawl-shield` middleware to any routes that need it.
 
 ## Result
 
-If you visit https://your-app, it will return a 403 status, if it's in a development environment. You can then bypass this 403 by visiting http://your-app/?pass=abc123. This is remembered in the session, so you don't need the password in every route afterwards.
+If you visit https://your-app, it will return a 403 status, if it's in a development environment. You can then bypass this 403 by visiting https://your-app/?pass=abc123. This is remembered in the session, so you don't need the password in every route afterwards.
