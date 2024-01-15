@@ -1,6 +1,7 @@
 {
     "name": "nerbiz/crawl-shield",
     "description": "Prevent search engine crawlers from indexing your Laravel dev/test sites",
+    "license": "MIT",
     "require-dev": {
         "php": "^8.1",
         "laravel/framework": "^10.0",
