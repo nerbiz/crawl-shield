@@ -2,7 +2,7 @@
 
 Prevent search engine crawlers from accessing your online test environments, by using a very simple password mechanism.
 
-### This is not in any way intended for security!
+### ⚠️ This is not in any way intended for security!
 
 It will prevent crawlers from indexing your temporary testing environment and to a certain degree it also prevents unwanted visits, but don't use this for application security.
 
@@ -10,7 +10,7 @@ It will prevent crawlers from indexing your temporary testing environment and to
 
 A `?pass=...` requirement is added to your routes using middleware. This is easy to use and remember by you, but unknown to search engines.
 
-The goal is to block all crawlers from seeing any content, in a way that always works. This is also disabled on production by default, so that indexing isn't accidentally blocked when it shouldn't be.
+The goal is to block all crawlers from indexing any test-environment content, in a way that always works. The mechanism is disabled on production by default.
 
 ## Installation
 
@@ -34,15 +34,38 @@ You can also disable the mechanism, or make it active in production:
 - `CRAWL_SHIELD_ENABLED` (default true)
 - `CRAWL_SHIELD_ENABLED_IN_PRODUCTION` (default false)
 
-#### Add middleware
+If you wish to publish the config file to your own `config/` directory, use this command:
 
-Add the below to the `$middlewareAliases` in your `App\Http\Kernel` class:
-
-```php
-'crawl-shield' => \Nerbiz\CrawlShield\Middleware\CrawlShieldMiddleware::class,
+```sh
+php artisan vendor:publish --tag=crawl-shield
 ```
 
-Then add the `crawl-shield` middleware to any routes that need it.
+#### Add middleware
+
+You have several options to apply the middleware in `App\Http\Kernel`, depending on how you want to shield your routes.
+
+```php
+// Option 1: Shield all routes
+protected $middleware = [
+    // ...
+    \Nerbiz\CrawlShield\Middleware\CrawlShieldMiddleware::class,
+];
+
+// Option 2: Shield only specific route group(s) 
+protected $middlewareGroups = [
+    'web' => [
+        // ...
+        \Nerbiz\CrawlShield\Middleware\CrawlShieldMiddleware::class,
+    ],
+    // ...
+];
+
+// Option 3: Custom usage in your routes/ directory
+protected $middlewareAliases = [
+    // ...
+    'crawl-shield' => \Nerbiz\CrawlShield\Middleware\CrawlShieldMiddleware::class,
+];
+```
 
 ## Result
 

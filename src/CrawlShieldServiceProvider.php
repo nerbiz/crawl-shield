@@ -21,6 +21,6 @@ class CrawlShieldServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__ . '/../config/crawl-shield.php' => config_path('crawl-shield.php'),
-        ], 'crawl-shield-config');
+        ], 'crawl-shield');
     }
 }
