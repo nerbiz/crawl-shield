@@ -1,72 +1,99 @@
-# Crawl shield
+# Crawl Shield
 
-Prevent search engine crawlers from accessing your online test environments, by using a very simple password mechanism.
+A lightweight Laravel package that restricts access to your application using a simple URL parameter.
 
-### ⚠️ This is not in any way intended for security!
+Crawl Shield helps keep unwanted visitors and search engine crawlers out, while allowing visitors with the correct parameter to browse freely once access has been granted.
 
-It will prevent crawlers from indexing your temporary testing environment and to a certain degree it also prevents unwanted visits, but don't use this for application security.
-
-## The concept
-
-A `?pass=...` requirement is added to your routes using middleware. This is easy to use and remember by you, but unknown to search engines.
-
-The goal is to block all crawlers from indexing any test-environment content, in a way that always works. The mechanism is disabled on production by default.
+**⚠️ Warning:** Crawl Shield is not a security solution. It discourages unwanted access but does not protect sensitive information or guarantee exclusion from search results.
 
 ## Installation
 
-Install this package using Composer:
-
-```sh
+```bash
 composer require nerbiz/crawl-shield
 ```
 
-## Usage
+## Configuration
 
-#### Configuration
+Crawl Shield works out of the box. To customise its behaviour, add any of the following variables to your `.env` file:
 
-If needed, you can add settings to your `.env` file.
+```dotenv
+CRAWL_SHIELD_PARAMETER=pass
+CRAWL_SHIELD_PASSWORD=abc123
+CRAWL_SHIELD_ENABLED=true
+CRAWL_SHIELD_ENABLED_IN_PRODUCTION=false
+```
 
-The default values result in https://example.com/?pass=abc123, you change that parameter and password with these: 
-- `CRAWL_SHIELD_PARAMETER` (default 'pass') 
-- `CRAWL_SHIELD_PASSWORD` (default 'abc123')
+These are the default values. **You are strongly advised to change `CRAWL_SHIELD_PARAMETER` and `CRAWL_SHIELD_PASSWORD` in your `.env` file**, as the defaults are publicly known.
 
-You can also disable the mechanism, or make it active in production:
-- `CRAWL_SHIELD_ENABLED` (default true)
-- `CRAWL_SHIELD_ENABLED_IN_PRODUCTION` (default false)
+You can optionally publish the configuration file:
 
-If you wish to publish the config file to your own `config/` directory, use this command:
-
-```sh
+```bash
 php artisan vendor:publish --tag=crawl-shield
 ```
 
-#### Add middleware
+This is not required, because all settings can be customised through environment variables.
 
-You have several options to apply the middleware in `App\Http\Kernel`, depending on how you want to shield your routes.
+## Middleware registration
+
+Register the middleware in `bootstrap/app.php` using one of the following approaches.
+
+### Option 1: Web routes (recommended)
+
+Protect all routes using Laravel's `web` middleware group:
 
 ```php
-// Option 1: Shield all routes
-protected $middleware = [
-    // ...
-    \Nerbiz\CrawlShield\Middleware\CrawlShieldMiddleware::class,
-];
+use Illuminate\Foundation\Configuration\Middleware;
+use Nerbiz\CrawlShield\Middleware\CrawlShieldMiddleware;
 
-// Option 2: Shield only specific route group(s) 
-protected $middlewareGroups = [
-    'web' => [
-        // ...
-        \Nerbiz\CrawlShield\Middleware\CrawlShieldMiddleware::class,
-    ],
-    // ...
-];
-
-// Option 3: Custom usage in your routes/ directory
-protected $middlewareAliases = [
-    // ...
-    'crawl-shield' => \Nerbiz\CrawlShield\Middleware\CrawlShieldMiddleware::class,
-];
+->withMiddleware(function (Middleware $middleware) {
+    $middleware->web(append: [
+        CrawlShieldMiddleware::class,
+    ]);
+})
 ```
 
-## Result
+### Option 2: Specific routes
 
-If you visit https://your-app, it will return a 403 status, if it's in a development environment. You can then bypass this 403 by visiting https://your-app/?pass=abc123. This is remembered in the session, so you don't need the password in every route afterwards.
+Register an alias in `bootstrap/app.php`:
+
+```php
+use Illuminate\Foundation\Configuration\Middleware;
+use Nerbiz\CrawlShield\Middleware\CrawlShieldMiddleware;
+
+->withMiddleware(function (Middleware $middleware) {
+    $middleware->alias([
+        'crawl-shield' => CrawlShieldMiddleware::class,
+    ]);
+})
+```
+
+Then apply it to individual routes or groups:
+
+```php
+Route::get('/preview', fn () => view('preview'))
+    ->middleware('crawl-shield');
+```
+
+These routes must use Laravel's `web` middleware group for session support.
+
+## Usage
+
+Without the correct query parameter, visitors receive an HTTP `403 Forbidden` response.
+
+To gain access, visit:
+
+```text
+https://example.com/?pass=abc123
+```
+
+Access is then remembered in the session, so the parameter isn't needed for subsequent requests.
+
+Crawl Shield is disabled in production by default.
+
+## Limitations
+
+Crawl Shield is a convenience barrier, not authentication. Anyone with the correct parameter can gain access, and the parameter may appear in browser history, logs or shared URLs.
+
+Although crawlers receive a `403` response, this does not guarantee that URLs won't appear in search results.
+
+For sensitive environments, use proper authentication or network-level access restrictions.

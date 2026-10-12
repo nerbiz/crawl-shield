@@ -26,7 +26,7 @@ class CrawlShieldMiddleware
 
         $parameter = config('crawl-shield.parameter');
         $correctPassword = config('crawl-shield.password');
-        $password = session('crawl-shield-password') ?? $request->query($parameter);
+        $password = $request->query($parameter) ?? session('crawl-shield-password');
 
         if ($password !== $correctPassword) {
             abort(403);
