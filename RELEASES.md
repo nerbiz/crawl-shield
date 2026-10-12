@@ -1,5 +1,13 @@
 # Release notes
 
+## 1.1.0
+#### 2026-10-12
+
+* Fixed: incorrect URL password was accepted when the correct password was stored in the session.
+* Updated development dependencies.
+* Updated the readme file.
+* Added a few tests.
+
 ## 1.0.3
 #### 2024-01-23
 
